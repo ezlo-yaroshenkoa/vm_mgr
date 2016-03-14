@@ -1,18 +1,14 @@
 import argparse
 
-def create_vm(parameters):
+def create_vm(params):
+    print 'create vm. name={}. br={}'.format(params.name, params.br)
     pass
 
-def delete_vm():
+def delete_vm(params):
+    print 'delete vm. name={}. br={}'.format(params.name, params.br)
     pass
 
-def power_off_vm():
-    pass
-
-def power_on_vm():
-    pass
-
-def reboot_vm():
+def manage_power(params):
     pass
 
 def list_vm():
@@ -21,36 +17,27 @@ def list_vm():
 def parse_cmd_line():
     parser = argparse.ArgumentParser(description='process command line')
 
-    parser.add_argument('--delete', dest='delete', type=str, help='--delete <vm_name>')
-    subparsers = parser.add_subparsers(help='subparsers')
+    subparsers = parser.add_subparsers(help='commands subparsers')
 
-    create_parser = subparsers.add_parser('create', help='create')
-    #create_parser.add_argument('--create', dest='create', action='store_true', help='')
-    create_parser.add_argument('--name', dest='name', type=str, help='')
-    create_parser.add_argument('--br', dest='br', type=str, help='')
+    parser_create = subparsers.add_parser('create')
+    parser_create.add_argument('-vm', type=str, help='vm name', required=True)
+    parser_create.add_argument('-br', type=str, help='bridge name')
+    parser_create.set_defaults(func=create_vm)
 
-    # parser.add_argument('--create', dest='create', nargs=2, type=str, help='--create <parameters>')
-    #parser.add_argument('--delete', dest='delete', type=str, help='--delete <vm_name>')
-    # parser.add_argument('--power-on', dest='power_on', type=str, help='--power-on <vm_name>')
-    # parser.add_argument('--power-off', dest='power_off', type=str, help='--power-off <vm_name>')
-    # parser.add_argument('--reboot', dest='reboot', type=str, help='--reboot <vm_name>')
-    # parser.add_argument('--shutdown', dest='shutdown', type=str, help='--shutdown <vm_name>')
-    # parser.add_argument('--list', dest='list', action='store_true', help='--list')
+    parser_delete = subparsers.add_parser('delete')
+    parser_delete.add_argument('-vm', type=str, help='vm name', required=True)
+    parser_delete.set_defaults(func=delete_vm)
+
+    parser_power = subparsers.add_parser('power')
+    parser_power.add_argument('-vm', type=str, help='vm name', required=True)
+    parser_power.add_argument('-on', action='store_true', help='power on')
+    parser_power.add_argument('-off', action='store_true', help='power off')
+    parser_power.add_argument('-reboot', action='store_true', help='reboot')
+    parser_power.set_defaults(func=manage_power)
 
     args = parser.parse_args()
 
-    if args.create:
-        create_vm(args.create)
-    elif args.delete:
-        delete_vm(args.delete)
-    elif args.power_off:
-        power_off_vm()
-    elif args.power_on:
-        power_on_vm(args.power_on)
-    elif args.reboot:
-        reboot_vm()
-    elif args.list:
-        list_vm()
+    args.func(args)
 
 if __name__ == '__main__':
     parse_cmd_line()
