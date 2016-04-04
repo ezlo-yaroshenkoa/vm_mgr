@@ -1,23 +1,59 @@
 import argparse
+import ConfigParser
+import requests
 
 def create_vm(params):
-    print 'create vm. name={}. br={}'.format(params.name, params.br)
-    pass
+    url = get_rest_server_url('vm/{}').format(params.vm)
+
+    try:
+        data = {'test': 't1'}
+        response = requests.post(url, data=data)
+        print response.text
+    except requests.RequestException as e:
+        print e
 
 def delete_vm(params):
-    print 'delete vm. name={}. br={}'.format(params.name, params.br)
-    pass
+    url = get_rest_server_url('vm/{}').format(params.vm)
+
+    try:
+        response = requests.delete(url)
+        print response.text
+    except requests.RequestException as e:
+        print e
 
 def manage_power(params):
     pass
 
-def list_vm():
-    pass
+def list_vm(params):
+    url = get_rest_server_url('vm')
+
+    try:
+        response = requests.get(url)
+        print response.text
+    except requests.RequestException as e:
+        print e
+
+def get_rest_server_url(request_name):
+    config = ConfigParser.RawConfigParser()
+
+    config.read('./../config.cfg')
+
+    section_name = 'rest_server'
+
+    host = config.get(section_name, 'host')
+    port = config.get(section_name, 'port')
+
+    request = 'http://{}:{}/{}'.format(host, port, request_name)
+
+    return request
 
 def parse_cmd_line():
     parser = argparse.ArgumentParser(description='process command line')
 
     subparsers = parser.add_subparsers(help='commands subparsers')
+
+    parser_list = subparsers.add_parser('list')
+    parser_list.set_defaults(func=list_vm)
 
     parser_create = subparsers.add_parser('create')
     parser_create.add_argument('-vm', type=str, help='vm name', required=True)
