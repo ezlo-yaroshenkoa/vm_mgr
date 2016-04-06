@@ -3,11 +3,11 @@ import ConfigParser
 import requests
 
 def create_vm(params):
-    url = get_rest_server_url('vm/{}').format(params.vm)
+    url = get_rest_server_url('vms/{}/power/on').format(params.vm)
 
     try:
-        data = {'test': 't1'}
-        response = requests.post(url, data=data)
+        #data = {'test': 't1'}
+        response = requests.post(url)
         print response.text
     except requests.RequestException as e:
         print e

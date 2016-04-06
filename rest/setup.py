@@ -1,22 +1,19 @@
-# -*- coding: utf-8 -*-
-try:
-    from setuptools import setup, find_packages
-except ImportError:
-    from ez_setup import use_setuptools
-    use_setuptools()
-    from setuptools import setup, find_packages
+from setuptools import setup, find_packages
+from pip.req import parse_requirements
+import uuid
+
+install_requires_pip = [str(ir.req) for ir in parse_requirements('requirements.txt', session=uuid.uuid1())]
 
 setup(
     name='rest',
     version='0.1',
-    description='',
-    author='',
+    description='vm manager rest service',
+    author='oleksii.iaroshenko',
     author_email='',
-    install_requires=[
-        "pecan",
-    ],
-    test_suite='rest',
+    setup_requires=[
+        'setuptools_git >= 0.3'],
+    install_requires=install_requires_pip,
     zip_safe=False,
     include_package_data=True,
-    packages=find_packages(exclude=['ez_setup'])
+    packages=find_packages()
 )

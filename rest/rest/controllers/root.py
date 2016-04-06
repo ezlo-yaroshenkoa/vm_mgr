@@ -1,14 +1,32 @@
 from pecan import expose
+from pecan.rest import RestController
+
+class PowerController(RestController):
+
+    @expose()
+    def post(self, vm_name, power_action):
+        return 'power controller. vm_name={}. power_action={}'.format(vm_name, power_action)
+
+class VmsController(RestController):
+
+    power = PowerController()
+
+    @expose()
+    def get(self):
+        return 'vms controller. get_all'
+
+    @expose()
+    def get_one(self, vm_name):
+        return 'vms controller. get_one. vm_name={}'.format(vm_name)
+
+    @expose()
+    def post(self, vm_name):
+        return 'vms controller. post. vm_name={}'.format(vm_name)
+
+    @expose()
+    def delete(self, vm_name):
+        return 'vms controller. delete. vm_name={}'.format(vm_name)
 
 class RootController(object):
-    @expose(generic=True, template='json')
-    def vm(self):
-        return 'get vm list'
 
-    @vm.when(method='POST')
-    def create_vm(self, vm_name, **data):
-        return 'vm {} added. params={}'.format(vm_name, data['test'])
-
-    @vm.when(method='DELETE')
-    def delete_vm(self, vm_name):
-        return 'vm {} deleted'.format(vm_name)
+    vms = VmsController()

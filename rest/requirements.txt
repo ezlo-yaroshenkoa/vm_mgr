@@ -1,0 +1,3 @@
+pecan==1.0.4
+pika==0.10.0
+sqlalchemy==1.0.11
