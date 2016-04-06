@@ -3,17 +3,17 @@ import ConfigParser
 import requests
 
 def create_vm(params):
-    url = get_rest_server_url('vms/{}/power/on').format(params.vm)
+    url = get_rest_server_url('vms/{}').format(params.vm)
 
     try:
-        #data = {'test': 't1'}
-        response = requests.post(url)
+        response = requests.post(url, {'br':params.br} if params.br else None)
+
         print response.text
     except requests.RequestException as e:
         print e
 
 def delete_vm(params):
-    url = get_rest_server_url('vm/{}').format(params.vm)
+    url = get_rest_server_url('vms/{}').format(params.vm)
 
     try:
         response = requests.delete(url)
@@ -22,10 +22,16 @@ def delete_vm(params):
         print e
 
 def manage_power(params):
-    pass
+    url = get_rest_server_url('vms/{}/power/{}').format(params.vm, params.action)
+
+    try:
+        response = requests.post(url)
+        print response.text
+    except requests.RequestException as e:
+        print e
 
 def list_vm(params):
-    url = get_rest_server_url('vm')
+    url = get_rest_server_url('vms')
 
     try:
         response = requests.get(url)
@@ -66,9 +72,7 @@ def parse_cmd_line():
 
     parser_power = subparsers.add_parser('power')
     parser_power.add_argument('-vm', type=str, help='vm name', required=True)
-    parser_power.add_argument('-on', action='store_true', help='power on')
-    parser_power.add_argument('-off', action='store_true', help='power off')
-    parser_power.add_argument('-reboot', action='store_true', help='reboot')
+    parser_power.add_argument('-action', type=str, help='power action. on/off/reboot', required=True)
     parser_power.set_defaults(func=manage_power)
 
     args = parser.parse_args()
