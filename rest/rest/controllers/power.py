@@ -24,4 +24,4 @@ class PowerController(RestController):
         if False == result:
             abort(500)
 
-        return 'vm created. vm_name={}'.format(vm_name)
+        return 'success'

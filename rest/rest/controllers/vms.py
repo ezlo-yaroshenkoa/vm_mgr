@@ -40,7 +40,7 @@ class VmsController(RestController):
         else:
             abort(500)
 
-        return 'vm created. vm_name={}'.format(vm_name)
+        return 'success'
 
     @expose()
     def delete(self, vm_name):
@@ -59,4 +59,4 @@ class VmsController(RestController):
         else:
             abort(500)
 
-        return 'vm deleted. vm_name={}'.format(vm_name)
+        return 'success'
