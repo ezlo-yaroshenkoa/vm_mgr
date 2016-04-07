@@ -1,31 +1,62 @@
-from pecan import expose
+from pecan import expose, abort
 from pecan.rest import RestController
 from power import PowerController
-from rest.rpc_client import RpcClient
+import json
+from rest.rpc_client import rpc_client
+from rest.vms_db import vms_db
 
 class VmsController(RestController):
 
-    power = PowerController()
+    power = None
+
+    def __init__(self):
+        self.vms_db_ = vms_db()
+        self.rpc_client_ = rpc_client()
+        self.power = PowerController(self.rpc_client_)
 
     @expose()
-    def get_all(self):
-        return 'vms controller. get_all'
-
-    @expose()
-    def get_one(self, vm_name):
-        return 'vms controller. get_one. vm_name={}'.format(vm_name)
+    def get(self):
+        return self.vm_db_.get_all()
 
     @expose()
     def post(self, vm_name, **data):
-        response = 'vms controller. post. vm_name={}'.format(vm_name)
+        data_to_send = dict()
+        data_to_send['command'] = 'create'
+        data_to_send['vm'] = vm_name
 
         br = data.get('br')
 
         if br:
-            response += '. br={}'.format(br)
+            data_to_send['br'] = br
 
-        return response
+        json_data = json.dumps(data_to_send)
+
+        result = self.rpc_client_.send_data(json_data)
+
+        print 'create vm result={}'.format(result)
+
+        if result:
+            self.vm_db_.add(vm_name)
+        else:
+            abort(500)
+
+        return 'vm created. vm_name={}'.format(vm_name)
 
     @expose()
     def delete(self, vm_name):
-        return 'vms controller. delete. vm_name={}'.format(vm_name)
+        data = dict()
+        data['command'] = 'delete'
+        data['vm'] = vm_name
+
+        json_data = json.dumps(data)
+
+        result = self.rpc_client_.send_data(json_data)
+
+        print 'delete vm result={}'.format(result)
+
+        if result:
+            self.vm_db_.delete(vm_name)
+        else:
+            abort(500)
+
+        return 'vm deleted. vm_name={}'.format(vm_name)

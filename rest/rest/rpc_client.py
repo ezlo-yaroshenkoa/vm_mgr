@@ -2,7 +2,7 @@ import pika
 import uuid
 import ConfigParser
 
-class RpcClient(object):
+class rpc_client(object):
     def __init__(self):
         config = ConfigParser.RawConfigParser()
 
