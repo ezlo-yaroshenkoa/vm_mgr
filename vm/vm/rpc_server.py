@@ -30,8 +30,6 @@ class RpcServer(object):
         self.channel_.basic_consume(self.on_request, queue=queue_name)
 
     def on_request(self, channel, method, props, body):
-        response = 0
-
         obj = json.loads(body)
 
         command = obj['command']
