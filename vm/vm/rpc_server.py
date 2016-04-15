@@ -1,7 +1,8 @@
 import pika
 import ConfigParser
-from pyroute2.iproute import IPRoute
+import vm
 import json
+from libvirt import libvirtError
 
 class RpcServer(object):
     def __init__(self):
@@ -33,17 +34,23 @@ class RpcServer(object):
 
         obj = json.loads(body)
 
-        action = obj['action']
-        bridge_name = obj['bridge_name']
+        command = obj['command']
 
-        print 'on request. action={}, bridge_name={}'.format(action, bridge_name)
+        response = 1
 
-        if action == 0:
-            response = self.create_bridge(bridge_name)
-        elif action == 1:
-            response = self.delete_bridge(bridge_name)
-
-        print 'response={}'.format(response)
+        try:
+            if command == 'create':
+                vm.create(obj['vm'], obj['br'])
+            elif command == 'delete':
+                vm.delete(obj['vm'])
+            elif command == 'power':
+                self.power_wm(obj['vm'], obj['power_action'])
+            else:
+                response = 0
+                print 'unknown command. command={}'.format(command)
+        except libvirtError as err:
+            response = 0
+            print err
 
         channel.basic_publish(exchange='',
                               routing_key=props.reply_to,
@@ -52,22 +59,13 @@ class RpcServer(object):
 
         channel.basic_ack(delivery_tag=method.delivery_tag)
 
-    def create_bridge(self, bridge_name):
-        try:
-            ip = IPRoute()
-            ip.link_create(ifname=bridge_name, kind='bridge')
-            return 1
-        finally:
-            return 0
-
-    def delete_bridge(self, bridge_name):
-        try:
-            ip = IPRoute()
-            idx = ip.link_lookup(ifname=bridge_name)[0]
-            ip.link_remove(idx)
-            return 1
-        finally:
-            return 0
+    def power_vm(self, name, action):
+        if action == 'on':
+            vm.power_on(name)
+        elif action == 'off':
+            vm.power_off(name)
+        elif action == 'reboot':
+            vm.reboot(name)
 
     def start(self):
         self.channel_.start_consuming()

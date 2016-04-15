@@ -21,7 +21,7 @@ class PowerController(RestController):
 
         print 'power. vm_name={}. action={}. result={}'.format(vm_name, power_action, result)
 
-        if False == result:
+        if '0' == result:
             abort(500)
 
         return 'success'

@@ -35,10 +35,10 @@ class VmsController(RestController):
 
         print 'create vm result={}'.format(result)
 
-        if result:
-            self.vm_db_.add(vm_name)
-        else:
+        if '0' == result:
             abort(500)
+
+        self.vm_db_.add(vm_name)
 
         return 'success'
 
@@ -54,9 +54,9 @@ class VmsController(RestController):
 
         print 'delete vm result={}'.format(result)
 
-        if result:
-            self.vm_db_.delete(vm_name)
-        else:
+        if '0' == result:
             abort(500)
+
+        self.vm_db_.delete(vm_name)
 
         return 'success'
