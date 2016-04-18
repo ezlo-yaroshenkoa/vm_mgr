@@ -16,7 +16,7 @@ class VmsController(RestController):
 
     @expose()
     def get(self):
-        return self.vm_db_.get_all()
+        return self.vms_db_.get_all()
 
     @expose()
     def post(self, vm_name, **data):
@@ -38,7 +38,7 @@ class VmsController(RestController):
         if '0' == result:
             abort(500)
 
-        self.vm_db_.add(vm_name)
+        self.vms_db_.add(vm_name)
 
         return 'success'
 
@@ -57,6 +57,6 @@ class VmsController(RestController):
         if '0' == result:
             abort(500)
 
-        self.vm_db_.delete(vm_name)
+        self.vms_db_.delete(vm_name)
 
         return 'success'
